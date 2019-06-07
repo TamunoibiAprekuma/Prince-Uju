@@ -811,3 +811,23 @@ header #intro {
   }
 
 }
+
+#clock,
+#count-down {
+	font-size: 4em;
+	text-align: center;
+}
+
+#count-down {
+  color: #ff3c41;
+  font-size: 50px;
+  text-align: center;
+  font-weight: 300;
+
+  font-family: 'Cantata One', sans-serif;
+  letter-spacing: 1px;
+  margin-left: 15%;
+  margin-right: 15%;
+  width: 70%;
+  margin-top: 0;
+}
