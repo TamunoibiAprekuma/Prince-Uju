@@ -1,63 +1,54 @@
-countdownManager = {
-  // Configuration
-  targetTime: new Date('May 15 00:00:00 2016'), // Date cible du compte à rebours (00:00:00)
-  displayElement: { // Elements HTML où sont affichés les informations
-    day: null,
-    hour: null,
-    min: null,
-    sec: null,
-  },
+const clock = document.getElementById('clock');
+const countDown = document.getElementById('count-down');
+const christmasDate = new Date('08 june 2019 10:00:00 +1');
 
-  // Initialisation du compte à rebours (à appeler 1 fois au chargement de la page)
-  init() {
-    // Récupération des références vers les éléments pour l'affichage
-    // La référence n'est récupérée qu'une seule fois à l'initialisation pour optimiser les performances
-    this.displayElement.day = jQuery('#countdown_day');
-    this.displayElement.hour = jQuery('#countdown_hour');
-    this.displayElement.min = jQuery('#countdown_min');
-    this.displayElement.sec = jQuery('#countdown_sec');
+function formatTimeNumber(number) {
+  if (number < 10) {
+    return `0${number}`;
+  }
 
-    // Lancement du compte à rebours
-    this.tick(); // Premier tick tout de suite
-    window.setInterval('countdownManager.tick();', 1000); // Ticks suivant, répété toutes les secondes (1000 ms)
-  },
+  return `${number}`;
+}
 
-  // Met à jour le compte à rebours (tic d'horloge)
-  tick() {
-    // Instant présent
-    let timeNow = new Date();
+function timeToString(hours, minutes, seconds) {
+  return `${hours}:${formatTimeNumber(minutes)}:${formatTimeNumber(seconds)}`;
+}
 
-    // On s'assure que le temps restant ne soit jamais négatif (ce qui est le cas dans le futur de targetTime)
-    if (timeNow > this.targetTime) {
-      timeNow = this.targetTime;
-    }
+function updateClock(clock) {
+  const currentTime = new Date();
+  const hours = currentTime.getHours();
+  const minutes = currentTime.getMinutes();
+  const seconds = currentTime.getSeconds();
+  const timeString = timeToString(hours, minutes, seconds);
+  clock.textContent = timeString;
+}
 
-    // Calcul du temps restant
-    const diff = this.dateDiff(timeNow, this.targetTime);
+// Date’s getTime is in milliseconds, so convert to seconds without decimal places
+function epochSecondsForDate(date) {
+  return Math.floor(date.getTime() / 1000);
+}
 
-    this.displayElement.day.text(diff.day);
-    this.displayElement.hour.text(diff.hour);
-    this.displayElement.min.text(diff.min);
-    this.displayElement.sec.text(diff.sec);
-  },
+function formatDuration(totalSeconds) {
+  const seconds = totalSeconds % 60;
+  const minutes = Math.floor(totalSeconds / 60) % 60;
+  const hours = Math.floor(totalSeconds / 3600) % 24;
+  const days = Math.floor(totalSeconds / (3600 * 24));
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
 
-  // Calcul la différence entre 2 dates, en jour/heure/minute/seconde
-  dateDiff(date1, date2) {
-    const diff = {}; // Initialisation du retour
-    let tmp = date2 - date1;
+function updateCountDown(element, endDate) {
+  const currentDate = new Date();
+  const currentTime = epochSecondsForDate(currentDate);
+  const endTime = epochSecondsForDate(endDate);
+  const secondsRemaining = endTime - currentTime;
+  element.textContent = formatDuration(secondsRemaining);
+}
 
-    tmp = Math.floor(tmp / 1000); // Nombre de secondes entre les 2 dates
-    diff.sec = tmp % 60; // Extraction du nombre de secondes
-    tmp = Math.floor((tmp - diff.sec) / 60); // Nombre de minutes (partie entière)
-    diff.min = tmp % 60; // Extraction du nombre de minutes
-    tmp = Math.floor((tmp - diff.min) / 60); // Nombre d'heures (entières)
-    diff.hour = tmp % 24; // Extraction du nombre d'heures
-    tmp = Math.floor((tmp - diff.hour) / 24); // Nombre de jours restants
-    diff.day = tmp;
+setInterval(() => {
+  updateClock(clock);
+  updateCountDown(countDown, christmasDate);
+}, 1000);
 
-    return diff;
-  },
-};
 
 jQuery(($) => {
   // Lancement du compte à rebours au chargement de la page
